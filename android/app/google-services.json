@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "368048740122",
+    "firebase_url": "https://animo-app-8378e-default-rtdb.firebaseio.com",
+    "project_id": "animo-app-8378e",
+    "storage_bucket": "animo-app-8378e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:368048740122:android:843531db3833d17e3dbea3",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "368048740122-6hjgd7d1irmvjp4gfvegrs3msnpp9lht.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBb3g1-3gdQdDp8v0R1B4SqoBK8ZNe0Lww"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "368048740122-6hjgd7d1irmvjp4gfvegrs3msnpp9lht.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
