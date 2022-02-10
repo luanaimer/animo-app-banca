@@ -1,9 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/data/auth_services.dart';
-import 'package:flutter_application_1/views/humor_lista.dart';
-import 'package:flutter_application_1/views/login_form.dart';
+import 'package:flutter_application_1/provider/auth_services.dart';
+import 'package:flutter_application_1/models/trofeu.dart';
+import 'package:flutter_application_1/provider/trofeus_repository.dart';
+import 'package:flutter_application_1/provider/usuario_repository.dart';
 import 'package:flutter_application_1/widgets/auth_check.dart';
-import 'package:provider/src/provider.dart';
+import 'package:form_field_validator/form_field_validator.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({Key? key}) : super(key: key);
@@ -13,9 +17,15 @@ class SignUpForm extends StatefulWidget {
 }
 
 class _SignUpFormState extends State<SignUpForm> {
-  final formkey = GlobalKey<FormState>();
+  final _formkey = GlobalKey<FormState>();
+  final nome = TextEditingController();
+  final sobrenome = TextEditingController();
   final email = TextEditingController();
+  final confirmarEmail = TextEditingController();
   final senha = TextEditingController();
+  final confirmarSenha = TextEditingController();
+  final dataNascimento = TextEditingController();
+  late Timestamp dataNascimentoTS;
 
   @override
   Widget build(BuildContext context) {
@@ -25,57 +35,108 @@ class _SignUpFormState extends State<SignUpForm> {
       ),
       body: SingleChildScrollView(
           child: Padding(
-        padding: EdgeInsets.only(top: 40),
+        padding: EdgeInsets.all(30),
         child: Form(
-          key: formkey,
+          key: _formkey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Text('Cadastro novo',
-              //     style: TextStyle(
-              //         fontSize: 35,
-              //         fontWeight: FontWeight.bold,
-              //         letterSpacing: -1.5)),
               Padding(
-                padding: EdgeInsets.all(12),
+                padding: EdgeInsets.only(bottom: 12),
                 child: TextFormField(
-                  //controller: email,
+                  controller: nome,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Nome',
+                      // border: OutlineInputBorder(),
+                      labelText: 'Nome',
+                      hintText: 'Informe um nome válido'),
+                  validator: MultiValidator(
+                    [
+                      RequiredValidator(errorText: "* Informação obrigatória"),
+                    ],
                   ),
-                  //keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Informe o seu nome!';
-                    }
-                    return null;
-                  },
                 ),
               ),
               Padding(
-                padding: EdgeInsets.all(12),
+                padding: EdgeInsets.only(bottom: 12),
+                child: TextFormField(
+                  controller: sobrenome,
+                  decoration: InputDecoration(
+                    // border: OutlineInputBorder(),
+                    labelText: 'Sobrenome',
+                  ),
+                  validator: (MultiValidator(
+                    [
+                      RequiredValidator(errorText: "* Informação obrigatória"),
+                    ],
+                  )),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 12),
+                child: TextFormField(
+                  controller: dataNascimento,
+                  decoration: InputDecoration(
+                    // border: OutlineInputBorder(),
+                    labelText: "Data de nascimento",
+                  ),
+                  onTap: () async {
+                    DateTime date = DateTime(1900);
+                    FocusScope.of(context).requestFocus(new FocusNode());
+
+                    date = (await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime(2100)))!;
+
+                    dataNascimento.text = DateFormat("dd/MM/yyyy").format(date);
+                    dataNascimentoTS = Timestamp.fromDate(date);
+                  },
+                  validator: (MultiValidator(
+                    [
+                      RequiredValidator(errorText: "* Informação obrigatória"),
+                    ],
+                  )),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 12),
                 child: TextFormField(
                   controller: email,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(),
+                    // border: OutlineInputBorder(),
                     labelText: 'Email',
                   ),
                   keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Informe o seu email!';
-                    }
-                    return null;
-                  },
+                  validator: (MultiValidator(
+                    [
+                      RequiredValidator(errorText: "* Informação obrigatória"),
+                    ],
+                  )),
                 ),
               ),
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                padding: EdgeInsets.only(bottom: 12),
+                child: TextFormField(
+                  controller: confirmarEmail,
+                  decoration: InputDecoration(
+                    // border: OutlineInputBorder(),
+                    labelText: 'Confirmar email',
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (MultiValidator(
+                    [
+                      RequiredValidator(errorText: "* Informação obrigatória"),
+                    ],
+                  )),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 12),
                 child: TextFormField(
                   controller: senha,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(),
+                    // border: OutlineInputBorder(),
                     labelText: 'Senha',
                   ),
                   obscureText: true,
@@ -90,16 +151,16 @@ class _SignUpFormState extends State<SignUpForm> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                padding: EdgeInsets.only(bottom: 32),
                 child: TextFormField(
-                  //controller: senha,
+                  controller: confirmarSenha,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(),
+                    // border: OutlineInputBorder(),
                     labelText: 'Confirmar senha',
                   ),
                   obscureText: true,
                   validator: (value) {
-                    if (value != senha) {
+                    if (value.toString() != senha.text) {
                       return 'As senhas não conferem!';
                     }
                     return null;
@@ -107,21 +168,37 @@ class _SignUpFormState extends State<SignUpForm> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.all(12),
+                padding: EdgeInsets.only(bottom: 12),
                 child: ElevatedButton(
                   onPressed: () async {
-                    try {
-                      await context
-                          .read<AuthServices>()
-                          .registrar(email.text, senha.text);
+                    if (_formkey.currentState!.validate()) {
+                      try {
+                        await context.read<AuthServices>().registrar(
+                              email.text,
+                              senha.text,
+                            );
 
-                      if (context.read<AuthServices>().usuario != null) {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                            '/humor_lista', (route) => false);
+                        await context.read<UsuarioRepository>().registrar(
+                            nome.text, sobrenome.text, dataNascimentoTS);
+
+                        if (context.read<AuthServices>().usuario != null) {
+                          await context.read<TrofeusRepository>().save(Trofeu(
+                              aplicado: [],
+                              descobridor: 0,
+                              determinado: [],
+                              engajado: 0,
+                              escritor: 0));
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AuthCheck()),
+                          );
+                        }
+                      } on AuthException catch (e) {
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(SnackBar(content: Text(e.message)));
                       }
-                    } on AuthException catch (e) {
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(SnackBar(content: Text(e.message)));
                     }
                   },
                   child: Row(

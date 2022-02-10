@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/data/auth_services.dart';
+import 'package:flutter_application_1/provider/auth_services.dart';
 import 'package:flutter_application_1/provider/humor_repository.dart';
+import 'package:flutter_application_1/views/reset_password.dart';
 import 'package:flutter_application_1/views/signup_form.dart';
 import 'package:provider/src/provider.dart';
 
@@ -27,13 +28,18 @@ class _LoginFormState extends State<LoginForm> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Bem vindo',
-                  style: TextStyle(
-                      fontSize: 35,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: -1.5)),
               Padding(
-                padding: EdgeInsets.all(24),
+                padding: const EdgeInsets.only(top: 64, bottom: 46),
+                child: Image.asset('assets/images/animo-logo-52px.png'),
+              ),
+              // Text('Bem vindo',
+              //     style: TextStyle(
+              //         fontSize: 35,
+              //         fontWeight: FontWeight.bold,
+              //         letterSpacing: -1.5)),
+              Padding(
+                padding:
+                    EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 12),
                 child: TextFormField(
                   controller: email,
                   decoration: InputDecoration(
@@ -50,7 +56,7 @@ class _LoginFormState extends State<LoginForm> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                padding: EdgeInsets.symmetric(vertical: 4, horizontal: 24),
                 child: TextFormField(
                   controller: senha,
                   decoration: InputDecoration(
@@ -69,6 +75,24 @@ class _LoginFormState extends State<LoginForm> {
                 ),
               ),
               Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const ResetPasswordForm()),
+                        );
+                      },
+                      child: Text('Esqueceu sua senha?'),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
                 padding: EdgeInsets.all(24),
                 child: ElevatedButton(
                   onPressed: () async {
@@ -77,7 +101,7 @@ class _LoginFormState extends State<LoginForm> {
                           .read<AuthServices>()
                           .login(email.text, senha.text);
 
-                      await context.read<HumoresRepository>().readHumores();
+                      //await context.read<HumoresRepository>().readHumores();
                     } on AuthException catch (e) {
                       ScaffoldMessenger.of(context)
                           .showSnackBar(SnackBar(content: Text(e.message)));
@@ -90,7 +114,7 @@ class _LoginFormState extends State<LoginForm> {
                         padding: EdgeInsets.all(16),
                         child: Text(
                           'Entrar',
-                          style: TextStyle(fontSize: 20),
+                          style: TextStyle(fontSize: 18),
                         ),
                       )
                     ],
